@@ -1,0 +1,21 @@
+{
+  "name": "aura-weather",
+  "version": "1.0.0",
+  "description": "A clean, glassmorphic weather application",
+  "main": "index.html",
+  "scripts": {
+    "dev": "http-server -p 8080",
+    "start": "http-server -p 8080"
+  },
+  "keywords": [
+    "weather",
+    "glassmorphism",
+    "dashboard"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
