@@ -1,0 +1,199 @@
+n<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura Weather — Clean, Minimalist & Glassmorphic</title>
+    <!-- FontAwesome for UI Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="light-theme">
+    <!-- Double background divs for crossfade transition -->
+    <div id="bg-base"></div>
+    <div id="bg-transition"></div>
+
+    <div class="app-container">
+        <!-- Header Section -->
+        <header>
+            <div class="brand-section">
+                <i class="fa-solid fa-cloud-sun-rain" style="font-size: 2rem; color: var(--text-primary);"></i>
+                <h1 class="brand-title">Aura Weather</h1>
+            </div>
+
+            <!-- Search Area -->
+            <div class="search-wrapper">
+                <div class="search-bar glass-panel">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-secondary);"></i>
+                    <input type="text" id="search-input" placeholder="Search city name..." autocomplete="off">
+                    <button id="search-btn">Search</button>
+                </div>
+                <!-- Autocomplete suggestions dropdown -->
+                <div id="suggestions-menu" class="suggestions-dropdown glass-panel"></div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="controls-group">
+                <!-- Geolocation trigger -->
+                <button id="locate-btn" class="icon-btn" title="Current Location">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                </button>
+                <!-- Light/Dark Mode toggler -->
+                <button id="theme-btn" class="icon-btn" title="Toggle Theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <!-- C/F unit switch -->
+                <div class="unit-toggle-container">
+                    <button id="unit-c" class="unit-btn active">°C</button>
+                    <button id="unit-f" class="unit-btn">°F</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar (Favorites & Alerts) -->
+        <aside class="glass-panel favorites-sidebar">
+            <div class="favorites-header">
+                <h3><i class="fa-regular fa-star" style="margin-right: 8px;"></i>Favorites</h3>
+                <button id="favorite-current-btn" class="icon-btn" style="width: 36px; height: 36px; font-size: 0.9rem;" title="Favorite Current City">
+                    <i class="fa-solid fa-star"></i>
+                </button>
+            </div>
+            
+            <!-- Error messages list inside container -->
+            <div id="error-container" class="error-container">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span id="error-message">City not found. Please try again.</span>
+                <button id="error-close" class="error-close">&times;</button>
+            </div>
+
+            <!-- Favorite cities container -->
+            <div id="favorites-list" class="favorites-list">
+                <!-- Will be dynamically generated -->
+                <div class="favorites-empty">No favorite locations saved yet.</div>
+            </div>
+        </aside>
+
+        <!-- Main Content (Dashboard) -->
+        <main class="weather-dashboard">
+            <!-- Hero Card: Main weather indicator -->
+            <div id="hero-card" class="glass-panel hero-card fade-in">
+                <!-- Loading State overlay inside Hero -->
+                <div id="loading-overlay" class="loading-overlay">
+                    <div class="spinner"></div>
+                    <span class="loading-text">Fetching live forecast...</span>
+                </div>
+
+                <div class="hero-main">
+                    <div class="hero-meta">
+                        <div id="location-name" class="location-name">
+                            <span>London, UK</span>
+                        </div>
+                        <div id="date-text" class="date-text">Sunday, June 7</div>
+                        
+                        <div class="temperature-display">
+                            <span id="main-temp" class="main-temp">24</span>
+                            <span id="temp-unit-symbol" class="temp-unit-symbol">°</span>
+                        </div>
+                        <div id="condition-text" class="condition-text">Clear sky</div>
+                        <div id="temp-range" class="temp-range">H: 26° L: 14°</div>
+                    </div>
+
+                    <!-- CSS Animated SVG Weather Icon container -->
+                    <div id="hero-icon-container" class="hero-icon-container">
+                        <!-- Will be dynamically populated with animated SVG -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Current weather grid metrics -->
+            <section class="details-grid">
+                <!-- Feels Like -->
+                <div class="glass-panel detail-card fade-in" style="animation-delay: 0.05s;">
+                    <div class="detail-title">
+                        <i class="fa-solid fa-temperature-half" style="color: #ff7675;"></i>
+                        <span>Feels Like</span>
+                    </div>
+                    <div id="detail-feels-like" class="detail-value">25°C</div>
+                    <div class="detail-desc">Wind chill & humidity factor</div>
+                </div>
+
+                <!-- Humidity -->
+                <div class="glass-panel detail-card fade-in" style="animation-delay: 0.1s;">
+                    <div class="detail-title">
+                        <i class="fa-solid fa-droplet" style="color: #74b9ff;"></i>
+                        <span>Humidity</span>
+                    </div>
+                    <div id="detail-humidity" class="detail-value">64%</div>
+                    <div id="detail-humidity-desc" class="detail-desc">The dew point is 15°C</div>
+                </div>
+
+                <!-- Wind Speed -->
+                <div class="glass-panel detail-card fade-in" style="animation-delay: 0.15s;">
+                    <div class="detail-title">
+                        <i class="fa-solid fa-wind" style="color: #81ecec;"></i>
+                        <span>Wind</span>
+                    </div>
+                    <div id="detail-wind" class="detail-value">12 km/h</div>
+                    <div id="detail-wind-desc" class="detail-desc">Direction: Northeast</div>
+                </div>
+
+                <!-- Visibility -->
+                <div class="glass-panel detail-card fade-in" style="animation-delay: 0.2s;">
+                    <div class="detail-title">
+                        <i class="fa-solid fa-eye" style="color: #a29bfe;"></i>
+                        <span>Visibility</span>
+                    </div>
+                    <div id="detail-visibility" class="detail-value">10 km</div>
+                    <div id="detail-visibility-desc" class="detail-desc">Perfectly clear view</div>
+                </div>
+
+                <!-- UV Index -->
+                <div class="glass-panel detail-card fade-in" style="animation-delay: 0.25s;">
+                    <div class="detail-title">
+                        <i class="fa-solid fa-sun" style="color: #ffeaa7;"></i>
+                        <span>UV Index</span>
+                    </div>
+                    <div id="detail-uv" class="detail-value">5</div>
+                    <div id="detail-uv-desc" class="detail-desc"><span class="level-badge level-moderate">Moderate</span></div>
+                </div>
+
+                <!-- Air Quality -->
+                <div class="glass-panel detail-card fade-in" style="animation-delay: 0.3s;">
+                    <div class="detail-title">
+                        <i class="fa-solid fa-leaf" style="color: #55efc4;"></i>
+                        <span>Air Quality</span>
+                    </div>
+                    <div id="detail-aqi" class="detail-value">48</div>
+                    <div id="detail-aqi-desc" class="detail-desc"><span class="level-badge level-good">Good</span></div>
+                </div>
+            </section>
+
+            <!-- Hourly Forecast (Horizontal Slider) -->
+            <section class="glass-panel hourly-card fade-in" style="animation-delay: 0.35s;">
+                <div class="section-title">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Hourly Forecast (24h)</span>
+                </div>
+                <div id="hourly-track" class="hourly-track">
+                    <!-- Hourly item template will repeat here dynamically -->
+                </div>
+            </section>
+
+            <!-- 7-Day Daily Forecast -->
+            <section class="glass-panel forecast-card fade-in" style="animation-delay: 0.4s;">
+                <div class="section-title">
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <span>7-Day Forecast</span>
+                </div>
+                <div id="forecast-list" class="forecast-list">
+                    <!-- 7-day items template will repeat here dynamically -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Application Script -->
+    <script src="app.js"></script>
+</body>
+</html>
